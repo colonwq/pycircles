@@ -27,10 +27,6 @@ def set_background_color(color):
         default_tile=0,
         x=0,  # Position relative to its parent group
         y=0,
-        #width=1,  # Number of tiles in the grid
-        #height=1,
-        # tile_width=None,  # Number of tiles * tile size must match BMP size
-        # tile_height=None,  # None means auto size the tiles
         )
 
     basegroup.append(tile_grid)
@@ -47,9 +43,6 @@ print("Loaded settings")
 basegroup = displayio.Group(max_size=3)
 #background, P0 and P1 circles
 
-#P0 = [110, 120]
-#P1 = [210, 120]
-
 set_background_color(0x000000)
 
 def draw_circles():
@@ -62,14 +55,12 @@ def draw_circles():
     collect()
     i = 0
     while i < NUM_RINGS:
-        #print("Adding circle: " + str(i) )
         P0Circiles.append(Circle(P0x, P0y,i*3, outline=0xFF0000))
         i+=1
         collect()
 
     i = 0
     while i < NUM_RINGS:
-        #print("Adding circle: " + str(i) )
         P1Circiles.append(Circle(P1x, P1y,i*3, outline=0x00FF00))
         i+=1
         collect()
