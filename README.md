@@ -11,14 +11,25 @@ The code is very basic
 - Displays the two ring groups
 - Sleeps for 5 seconds before deleting the ring groups and starting over.
 
+**Update**
+- Custom circle function is used instead of the adafruit_display_shapes
+- All circles are drawn into one bitmap
+- Configuration parameters are added to the top of the code.py
+  - NUM_RINGS: The number of rings to be drawn per group
+  - RING_SPACING: How many pixels to increase the next ring from the previous
+  - COLOR_ONE, COLOR_TWO: The RGB color of the rings
+  - SMOOTHNESS: A fudge factor for how many steps to go around the diameter of the circle
+  - SLEEP_SECONDS: How many seconds to sleep between ring generations
+
 **The Good**
 
-The overlapping pattern is very nice
+- The overlapping pattern is very nice
+- Much less memory usages
+- Faster image display.
+  - The image will complete a redraw in ~1 sec
 
 **The Bad**
-- This consumes a lot of memory. I do not know how many more circles can be added
-- Drawing a single frame of the display is about 20 seconds. 20 seconds is too long for a reasonable live display.
+- Not quite fast enough for a live display
 
 **Options**
-- The memory pressure could be reduced if each circle group could be one bitmap.
-- I don't know of any options for speeding the display updates. 
+
