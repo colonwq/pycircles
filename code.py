@@ -17,6 +17,7 @@ NUM_RINGS = 30
 RING_SPACING = 5
 COLOR_ONE = 0xFF0000
 COLOR_TWO = 0x00FF00
+COLOR_BACKGROUND = 0x000000
 SMOOTHNESS = 5
 SLEEP_SECONDS = .1
 
@@ -34,7 +35,7 @@ def set_background_color(color):
 
     tile_grid = displayio.TileGrid(
         color_bitmap,
-        pixel_shader=displayio.ColorConverter(),
+        pixel_shader=color_palette,
         default_tile=0,
         x=0,  # Position relative to its parent group
         y=0,
@@ -54,7 +55,7 @@ print("Loaded settings")
 basegroup = displayio.Group(max_size=3)
 #background, P0 and P1 circles
 
-set_background_color(0x000000)
+set_background_color(COLOR_BACKGROUND)
 
 def draw_circle(h, k, r, target_bitmap, color):
     '''This function will draw a circle based on math found
@@ -95,20 +96,20 @@ def draw_circles():
     P0Pallete = displayio.Palette(3)
     P0Pallete[2] = COLOR_TWO
     P0Pallete[1] = COLOR_ONE
+    #P0Pallete[0] = 0xFFFF00
     #P0Pallete[0] = 0x000000
     P0Pallete.make_transparent(0)
     P0TileGrid = displayio.TileGrid(P0Circiles, pixel_shader=P0Pallete)
 
     collect()
-    #draw the red circles
+    #draw the first circles
     i = 1
     while i < NUM_RINGS:
-        #print("Drawing a Red Circle")
         draw_circle(P0x, P0y,i*RING_SPACING, P0Circiles, 1)
         i+=1
         collect()
 
-    #draw the green draw_circles
+    #draw the second draw_circles
     i = 1
     while i < NUM_RINGS:
         #print("Drawing a Green Circle")
@@ -126,5 +127,6 @@ print("Finished drawing first circles")
 
 while True:
     time.sleep(SLEEP_SECONDS)
-    collect(verbose=1)
+    #collect(verbose=1)
+    collect()
     draw_circles()
