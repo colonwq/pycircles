@@ -18,6 +18,7 @@ The code is very basic
   - NUM_RINGS: The number of rings to be drawn per group
   - RING_SPACING: How many pixels to increase the next ring from the previous
   - COLOR_ONE, COLOR_TWO: The RGB color of the rings
+  - COLOR_BACKGROUND: The color of the background
   - SMOOTHNESS: A fudge factor for how many steps to go around the diameter of the circle
   - SLEEP_SECONDS: How many seconds to sleep between ring generations
 
