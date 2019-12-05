@@ -6,10 +6,10 @@ The code is very basic
 
 - Sets the background to a black bitmap
 - Creates to display groups to contain circles
-- Generate a random X,Y for each ring center
+- Move X,Y for each ring center a random amount up to MAX_WOBBLE
 - Creates twp sets of 30 rings (NUM_RINGS)
 - Displays the two ring groups
-- Sleeps for 5 seconds before deleting the ring groups and starting over.
+- Sleeps for SLEEP_SECONDS seconds before deleting the ring groups and starting over.
 
 **Update**
 - Custom circle function is used instead of the adafruit_display_shapes
@@ -21,6 +21,7 @@ The code is very basic
   - COLOR_BACKGROUND: The color of the background
   - SMOOTHNESS: A fudge factor for how many steps to go around the diameter of the circle
   - SLEEP_SECONDS: How many seconds to sleep between ring generations
+  - MAX_WOBBLE: what is the +- max the cetners can move per iteration
 
 **The Good**
 
