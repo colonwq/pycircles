@@ -13,13 +13,21 @@ from adafruit_display_shapes.circle import Circle
 # more math == more time
 # more rings == more math
 # more smoothness == more math
-NUM_RINGS = 30
+NUM_RINGS = 20
 RING_SPACING = 5
 COLOR_ONE = 0xFF0000
 COLOR_TWO = 0x00FF00
 COLOR_BACKGROUND = 0x000000
-SMOOTHNESS = 5
-SLEEP_SECONDS = .1
+SMOOTHNESS = 4
+SLEEP_SECONDS = 0
+MAX_WOBBLE = 5
+
+#start the circles in the center-ish
+P0x = 200
+P0y = 120
+P1x = 160
+P1y = 120
+
 
 def collect(verbose=0):
     if verbose==1:
@@ -87,17 +95,39 @@ def draw_circle(h, k, r, target_bitmap, color):
 
 def draw_circles():
     #print("Draw Circles called")
-    P0x = random.randint(60,260)
-    P0y = random.randint(60,180)
-    P1x = random.randint(60,260)
-    P1y = random.randint(60,180)
+    wobbleP0x = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
+    wobbleP0y = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
+    wobbleP1x = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
+    wobbleP1y = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
+
+    global P0x
+    global P0y
+    global P1x
+    global P1y
+
+    #dont walk off the edges of the screen
+    if P0x + wobbleP0x >= 320 or P0x + wobbleP0x < 0:
+        P0x-=wobbleP0x
+    else:
+        P0x+=wobbleP0x
+    if P0y + wobbleP0y >= 240 or P0y + wobbleP0y < 0:
+        P0y-=wobbleP0y
+    else:
+        P0y+=wobbleP0y
+
+    if P1x + wobbleP1x >= 320 or P1x + wobbleP1x < 0:
+        P1x-=wobbleP1x
+    else:
+        P1x+=wobbleP1x
+    if P1y + wobbleP1y >= 240 or P1y + wobbleP1y < 0:
+        P1y-=wobbleP1y
+    else:
+        P1y+=wobbleP1y
 
     P0Circiles = displayio.Bitmap(board.DISPLAY.width, board.DISPLAY.height, 3)
     P0Pallete = displayio.Palette(3)
     P0Pallete[2] = COLOR_TWO
     P0Pallete[1] = COLOR_ONE
-    #P0Pallete[0] = 0xFFFF00
-    #P0Pallete[0] = 0x000000
     P0Pallete.make_transparent(0)
     P0TileGrid = displayio.TileGrid(P0Circiles, pixel_shader=P0Pallete)
 
