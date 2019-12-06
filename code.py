@@ -13,21 +13,20 @@ from adafruit_display_shapes.circle import Circle
 # more math == more time
 # more rings == more math
 # more smoothness == more math
-NUM_RINGS = 20
+NUM_RINGS = 60
 RING_SPACING = 5
 COLOR_ONE = 0xFF0000
 COLOR_TWO = 0x00FF00
 COLOR_BACKGROUND = 0x000000
 SMOOTHNESS = 4
-SLEEP_SECONDS = 0
+SLEEP_SECONDS = 5
 MAX_WOBBLE = 5
 
 #start the circles in the center-ish
-P0x = 200
-P0y = 120
-P1x = 160
-P1y = 120
-
+P0x = 300
+P0y = 200
+P1x = 0
+P1y = 0
 
 def collect(verbose=0):
     if verbose==1:
@@ -94,69 +93,135 @@ def draw_circle(h, k, r, target_bitmap, color):
         theta+=step
 
 def draw_circles():
-    #print("Draw Circles called")
+    global P0Circles
+    global P1Circles
+    print("Draw circles called")
+    #draw the first circles
+    i = 1
+    while i < NUM_RINGS:
+        draw_circle(320, 240,i*RING_SPACING, P0Circles, 1)
+        i+=1
+
+    #draw the second draw_circles
+    i = 1
+    while i < NUM_RINGS:
+        draw_circle(320, 240,i*RING_SPACING, P1Circles, 2)
+        i+=1
+    collect()
+
+def make_palette():
+    global P0Palette
+    print("Make palette called")
+    P0Palette = displayio.Palette(3)
+    P0Palette[2] = COLOR_TWO
+    P0Palette[1] = COLOR_ONE
+    #P0Palette[0] = 0x888888
+    P0Palette.make_transparent(0)
+
+def make_bitmaps():
+    global PxCircles
+    global P0Circles
+    global P1Circles
+    print("Make bitmaps called")
+    PxCircles = displayio.Bitmap(board.DISPLAY.width, board.DISPLAY.height, 3)
+    P0Circles = displayio.Bitmap(board.DISPLAY.width*2, board.DISPLAY.height*2, 3)
+    P1Circles = displayio.Bitmap(board.DISPLAY.width*2, board.DISPLAY.height*2, 3)
+
+def place_circles():
+    global P0Circles
+    global P1Circles
+    global P0Palette
+    global P0TileGrid
+    global P1TileGrid
+    global P0x
+    global P0y
+    global P1x
+    global P1y
+    print("Place circles called")
+    #P0TileGrid = displayio.TileGrid(P0Circles, pixel_shader=P0Palette, x=P0x, y=P0y)
+    #P1TileGrid = displayio.TileGrid(P1Circles, pixel_shader=P0Palette, x=P1x, y=P1y)
+    copy_area( src_bmp = P0Circles, dest_bmp=PxCircles, src_x = P0x, src_y = P0y )
+
+    PxTileGrid = displayio.TileGrid(PxCircles, pixel_shader=P0Palette)
+    basegroup.append(PxTileGrid)
+    #basegroup.append(P0TileGrid)
+    #basegroup.append(P1TileGrid)
+    board.DISPLAY.wait_for_frame()
+
+def fudge_tilegrids():
+    global P0TileGrid
+    global P1TileGrid
+    global P0x
+    global P0y
+    global P1x
+    global P1y
+    print("Fudge tile grids called")
     wobbleP0x = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
     wobbleP0y = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
     wobbleP1x = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
     wobbleP1y = random.randint(-MAX_WOBBLE,MAX_WOBBLE)
 
-    global P0x
-    global P0y
-    global P1x
-    global P1y
+    P0x = P0TileGrid.x + wobbleP0x
+    P0y = P0TileGrid.y + wobbleP0y
+    P1x = P1TileGrid.x + wobbleP1x
+    P1y = P1TileGrid.y + wobbleP1y
+    print("Base group length: %d" % (len(basegroup)) )
+    #basegroup.pop(len(basegroup)-1)
+    #basegroup.pop(len(basegroup)-1)
+    place_circles()
 
-    #dont walk off the edges of the screen
-    if P0x + wobbleP0x >= 320 or P0x + wobbleP0x < 0:
-        P0x-=wobbleP0x
-    else:
-        P0x+=wobbleP0x
-    if P0y + wobbleP0y >= 240 or P0y + wobbleP0y < 0:
-        P0y-=wobbleP0y
-    else:
-        P0y+=wobbleP0y
+def copy_area( src_bmp: displayio.Bitmap, dest_bmp: displayio.Bitmap, src_x = 0, src_y = 0, dest_x = 0, dest_y = 0, width = 320, height = 240):
+    global Pxcircles
+    global P0Circles
+    print("Copy area called")
+    if src_bmp == None or dest_bmp == None:
+        raise Exception("src_bmp and dest_bmp must be defined")
+    if src_x + width > src_bmp.width:
+        raise Exception("Source end width out of bounds of source image")
+    if src_y + height > src_bmp.height:
+        raise Exception("Source end height out of bounds of source image")
+    if dest_x + width > dest_bmp.width:
+        raise Exception("Destination end width out of bounds of destination image")
+    if dest_y + height > dest_bmp.height:
+        raise Exception("Destination end height out of bounds of destination image")
 
-    if P1x + wobbleP1x >= 320 or P1x + wobbleP1x < 0:
-        P1x-=wobbleP1x
-    else:
-        P1x+=wobbleP1x
-    if P1y + wobbleP1y >= 240 or P1y + wobbleP1y < 0:
-        P1y-=wobbleP1y
-    else:
-        P1y+=wobbleP1y
+    print("Src bmp size: (%d,%d)" %( src_bmp.width, src_bmp.height))
+    print("Dest bmp size: (%d,%d)" %( dest_bmp.width, dest_bmp.height))
+    print("Copy area : (%d,%d)" % (width, height))
+    for x in range(width):
+        for y in range(height):
+            #print("Copy location %d %d" %(x,y))
+            #if dest_bmp[dest_x+x,dest_y+y] != 0:
+            #    dest_bmp[dest_x+x,dest_y+y] = src_bmp[src_x+x,src_y+y]
+            dest_bmp[dest_x+x,dest_y+y] = src_bmp[src_x+x,src_y+y]
+    print("Copy area finished")
 
-    P0Circiles = displayio.Bitmap(board.DISPLAY.width, board.DISPLAY.height, 3)
-    P0Pallete = displayio.Palette(3)
-    P0Pallete[2] = COLOR_TWO
-    P0Pallete[1] = COLOR_ONE
-    P0Pallete.make_transparent(0)
-    P0TileGrid = displayio.TileGrid(P0Circiles, pixel_shader=P0Pallete)
 
-    collect()
-    #draw the first circles
-    i = 1
-    while i < NUM_RINGS:
-        draw_circle(P0x, P0y,i*RING_SPACING, P0Circiles, 1)
-        i+=1
-        collect()
 
-    #draw the second draw_circles
-    i = 1
-    while i < NUM_RINGS:
-        #print("Drawing a Green Circle")
-        draw_circle(P1x, P1y,i*RING_SPACING, P0Circiles, 2)
-        i+=1
-        collect()
+#three colors [transparent, color_one, color_two]
+P0Palette = None
+#bmp 320x240 3 color
+PxCircles = None
+#bmp 640x480 3 color
+P0Circles = None
+#bmp 640x480 3 color
+P1Circles = None
+PxTileGrid = None
+P0TileGrid = None
+P1TileGrid = None
 
-    if len(basegroup) > 1:
-        basegroup.pop(len(basegroup)-1)
-    basegroup.append(P0TileGrid)
-    board.DISPLAY.wait_for_frame()
-
+#make the color palette
+make_palette()
+#make the 
+make_bitmaps()
+#add cirlces to P[01]Circles
 draw_circles()
+place_circles()
+
 print("Finished drawing first circles")
 
 while True:
     time.sleep(SLEEP_SECONDS)
-    #collect(verbose=1)
-    collect()
-    draw_circles()
+    collect(verbose=1)
+    #collect()
+    #fudge_tilegrids()
